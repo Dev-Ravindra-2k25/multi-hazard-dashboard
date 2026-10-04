@@ -1,0 +1,182 @@
+[
+  {
+    "regionName": "Puri",
+    "name": "Puri Cyclone & Flood Relief Center",
+    "location": {
+      "lat": 19.8150,
+      "lon": 85.8320
+    },
+    "capacity": 800
+  },
+  {
+    "regionName": "Puri",
+    "name": "Jagannath High School Shelter",
+    "location": {
+      "lat": 19.8080,
+      "lon": 85.8200
+    },
+    "capacity": 500
+  },
+  {
+    "regionName": "Chamoli",
+    "name": "Gopeshwar Disaster Relief Camp",
+    "location": {
+      "lat": 30.4180,
+      "lon": 79.3320
+    },
+    "capacity": 350
+  },
+  {
+    "regionName": "Chamoli",
+    "name": "Joshimath Emergency Community Shelter",
+    "location": {
+      "lat": 30.5560,
+      "lon": 79.5670
+    },
+    "capacity": 450
+  },
+  {
+    "regionName": "Wayanad",
+    "name": "Kalpetta Relief Camp",
+    "location": {
+      "lat": 11.6080,
+      "lon": 76.0820
+    },
+    "capacity": 600
+  },
+  {
+    "regionName": "Wayanad",
+    "name": "Mananthavady Government Model School",
+    "location": {
+      "lat": 11.8020,
+      "lon": 76.0030
+    },
+    "capacity": 550
+  },
+  {
+    "regionName": "Cuttack",
+    "name": "Barabati Indoor Relief Center",
+    "location": {
+      "lat": 20.4810,
+      "lon": 85.8670
+    },
+    "capacity": 1200
+  },
+  {
+    "regionName": "Cuttack",
+    "name": "Choudwar Flood Shelter",
+    "location": {
+      "lat": 20.5210,
+      "lon": 85.9120
+    },
+    "capacity": 700
+  },
+  {
+    "regionName": "Bhuj",
+    "name": "Bhuj Town Hall Earthquake Shelter",
+    "location": {
+      "lat": 23.2450,
+      "lon": 69.6680
+    },
+    "capacity": 850
+  },
+  {
+    "regionName": "Bhuj",
+    "name": "Jubilee Ground Emergency Center",
+    "location": {
+      "lat": 23.2510,
+      "lon": 69.6720
+    },
+    "capacity": 1000
+  },
+  {
+    "regionName": "Patna",
+    "name": "Gandhi Maidan Flood Evacuation Center",
+    "location": {
+      "lat": 25.6170,
+      "lon": 85.1430
+    },
+    "capacity": 1500
+  },
+  {
+    "regionName": "Patna",
+    "name": "Digha Community Relief Center",
+    "location": {
+      "lat": 25.6520,
+      "lon": 85.0880
+    },
+    "capacity": 750
+  },
+  {
+    "regionName": "Chennai",
+    "name": "Jawaharlal Nehru Stadium Shelter",
+    "location": {
+      "lat": 13.0840,
+      "lon": 80.2760
+    },
+    "capacity": 2000
+  },
+  {
+    "regionName": "Chennai",
+    "name": "Velachery Flood Relief Camp",
+    "location": {
+      "lat": 12.9810,
+      "lon": 80.2180
+    },
+    "capacity": 900
+  },
+  {
+    "regionName": "Guwahati",
+    "name": "Sarusajai Stadium Relief Camp",
+    "location": {
+      "lat": 26.1150,
+      "lon": 91.7580
+    },
+    "capacity": 1600
+  },
+  {
+    "regionName": "Guwahati",
+    "name": "Pandu Port Community Shelter",
+    "location": {
+      "lat": 26.1780,
+      "lon": 91.6890
+    },
+    "capacity": 650
+  },
+  {
+    "regionName": "Uttarkashi",
+    "name": "Ramanagar Community Hall",
+    "location": {
+      "lat": 30.7310,
+      "lon": 78.4410
+    },
+    "capacity": 400
+  },
+  {
+    "regionName": "Uttarkashi",
+    "name": "Matli Emergency Shelter",
+    "location": {
+      "lat": 30.7050,
+      "lon": 78.4620
+    },
+    "capacity": 500
+  },
+  {
+    "regionName": "Mumbai Suburban",
+    "name": "Andheri Sports Complex Relief Shelter",
+    "location": {
+      "lat": 19.1290,
+      "lon": 72.8360
+    },
+    "capacity": 1800
+  },
+  {
+    "regionName": "Mumbai Suburban",
+    "name": "Kurla Community Hall Shelter",
+    "location": {
+      "lat": 19.0680,
+      "lon": 72.8830
+    },
+    "capacity": 1000
+  }
+]
