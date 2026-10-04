@@ -6,9 +6,10 @@
 - Slice 3: ingestion (weather, seismic 300km, river CSV, node-cron scheduler, tests)
 - Slice 4: scoring (indices, engine with weights/stale flag, scheduler hook, tests)
 - Slice 5: read API (GET /regions, /regions/:id/score, /shelters, /alerts, tests)
+- Slice 6: citizen UI (home page, search, score card, breakdown chart, shelters, 60s polling)
 
 ## Next
-- Slice 6: citizen UI (home page, search, score card, breakdown, shelters)
+- Slice 7: auth + admin UI (JWT login, admin overview map, region drill-down)
 
 ## Known issues
 - none
