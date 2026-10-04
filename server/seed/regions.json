@@ -1,0 +1,82 @@
+[
+  {
+    "name": "Puri",
+    "location": {
+      "lat": 19.8135,
+      "lon": 85.8312
+    },
+    "population": 1698737
+  },
+  {
+    "name": "Chamoli",
+    "location": {
+      "lat": 30.4227,
+      "lon": 79.3283
+    },
+    "population": 391605
+  },
+  {
+    "name": "Wayanad",
+    "location": {
+      "lat": 11.6854,
+      "lon": 76.1320
+    },
+    "population": 817420
+  },
+  {
+    "name": "Cuttack",
+    "location": {
+      "lat": 20.4625,
+      "lon": 85.8828
+    },
+    "population": 2624470
+  },
+  {
+    "name": "Bhuj",
+    "location": {
+      "lat": 23.2420,
+      "lon": 69.6669
+    },
+    "population": 2092371
+  },
+  {
+    "name": "Patna",
+    "location": {
+      "lat": 25.5941,
+      "lon": 85.1376
+    },
+    "population": 5838465
+  },
+  {
+    "name": "Chennai",
+    "location": {
+      "lat": 13.0827,
+      "lon": 80.2707
+    },
+    "population": 7088403
+  },
+  {
+    "name": "Guwahati",
+    "location": {
+      "lat": 26.1445,
+      "lon": 91.7362
+    },
+    "population": 1253938
+  },
+  {
+    "name": "Uttarkashi",
+    "location": {
+      "lat": 30.7268,
+      "lon": 78.4354
+    },
+    "population": 330086
+  },
+  {
+    "name": "Mumbai Suburban",
+    "location": {
+      "lat": 19.0760,
+      "lon": 72.8777
+    },
+    "population": 9356962
+  }
+]

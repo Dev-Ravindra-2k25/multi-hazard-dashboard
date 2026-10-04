@@ -1,10 +1,10 @@
 # Progress
 
 ## Done
-- (nothing yet)
+- Slice 1: scaffold (Express/Vite skeletons, health route, 10 district seeds, README)
 
 ## Next
-- Slice 1: scaffold
+- Slice 2: models and seed script
 
 ## Known issues
 - none
