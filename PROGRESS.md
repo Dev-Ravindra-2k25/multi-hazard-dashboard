@@ -3,9 +3,10 @@
 ## Done
 - Slice 1: scaffold (Express/Vite skeletons, health route, 10 district seeds, README)
 - Slice 2: models & seed (Mongoose models, RiskScore index, shelters seed, admin/config seed, tests)
+- Slice 3: ingestion (weather, seismic 300km, river CSV, node-cron scheduler, tests)
 
 ## Next
-- Slice 3: ingestion (weather, seismic, river, scheduler)
+- Slice 4: scoring (indices, engine, tests)
 
 ## Known issues
 - none
