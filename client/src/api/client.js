@@ -3,9 +3,15 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 export async function fetchClient(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`;
   
+  const token = localStorage.getItem('token');
+
   const defaultHeaders = {
     'Content-Type': 'application/json'
   };
+
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`;
+  }
 
   const config = {
     ...options,
@@ -25,7 +31,7 @@ export async function fetchClient(endpoint, options = {}) {
         errorMsg = errData.error;
       }
     } catch {
-      // Ignore JSON parse error on non-JSON response
+      // Non-JSON error response
     }
     throw new Error(errorMsg);
   }

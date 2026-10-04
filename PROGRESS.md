@@ -7,9 +7,10 @@
 - Slice 4: scoring (indices, engine with weights/stale flag, scheduler hook, tests)
 - Slice 5: read API (GET /regions, /regions/:id/score, /shelters, /alerts, tests)
 - Slice 6: citizen UI (home page, search, score card, breakdown chart, shelters, 60s polling)
+- Slice 7: auth + admin UI (JWT 8h login, rate limiting, Leaflet map overview, region drill-down, history chart, tests)
 
 ## Next
-- Slice 7: auth + admin UI (JWT login, admin overview map, region drill-down)
+- Slice 8: alerts (auto alert on band change to High/Severe, manual alert endpoint, admin form, log, polling)
 
 ## Known issues
 - none

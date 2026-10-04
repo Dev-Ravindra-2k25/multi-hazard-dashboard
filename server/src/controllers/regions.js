@@ -97,3 +97,35 @@ export async function getRegionShelters(req, res, next) {
     next(err);
   }
 }
+
+export async function getRegionHistory(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { from, to } = req.query;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid region ID format' });
+    }
+
+    const regionExists = await Region.exists({ _id: id });
+    if (!regionExists) {
+      return res.status(404).json({ error: 'Region not found' });
+    }
+
+    const startDate = from ? new Date(from) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const endDate = to ? new Date(to) : new Date();
+
+    const history = await RiskScore.find({
+      regionId: id,
+      computedAt: { $gte: startDate, $lte: endDate }
+    })
+      .sort({ computedAt: 1 })
+      .limit(500)
+      .select('floodIdx seismicIdx cyclonIdx composite band stale computedAt')
+      .lean();
+
+    res.json(history);
+  } catch (err) {
+    next(err);
+  }
+}

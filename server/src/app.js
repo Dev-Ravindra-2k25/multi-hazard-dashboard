@@ -3,6 +3,8 @@ import cors from 'cors';
 import { config } from './config.js';
 import regionsRouter from './routes/regions.js';
 import alertsRouter from './routes/alerts.js';
+import authRouter from './routes/auth.js';
+import adminRouter from './routes/admin.js';
 
 export function createApp() {
   const app = express();
@@ -19,9 +21,11 @@ export function createApp() {
     });
   });
 
-  // Public API routes
+  // API routes
+  app.use('/api/auth', authRouter);
   app.use('/api/regions', regionsRouter);
   app.use('/api/alerts', alertsRouter);
+  app.use('/api/admin', adminRouter);
 
   // 404 handler
   app.use((req, res) => {
