@@ -5,9 +5,10 @@
 - Slice 2: models & seed (Mongoose models, RiskScore index, shelters seed, admin/config seed, tests)
 - Slice 3: ingestion (weather, seismic 300km, river CSV, node-cron scheduler, tests)
 - Slice 4: scoring (indices, engine with weights/stale flag, scheduler hook, tests)
+- Slice 5: read API (GET /regions, /regions/:id/score, /shelters, /alerts, tests)
 
 ## Next
-- Slice 5: read API (GET /regions, /regions/:id/score, /shelters, /alerts, tests)
+- Slice 6: citizen UI (home page, search, score card, breakdown, shelters)
 
 ## Known issues
 - none

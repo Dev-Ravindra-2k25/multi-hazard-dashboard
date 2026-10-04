@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import { config } from './config.js';
+import regionsRouter from './routes/regions.js';
+import alertsRouter from './routes/alerts.js';
 
 export function createApp() {
   const app = express();
@@ -16,6 +18,10 @@ export function createApp() {
       timestamp: new Date().toISOString()
     });
   });
+
+  // Public API routes
+  app.use('/api/regions', regionsRouter);
+  app.use('/api/alerts', alertsRouter);
 
   // 404 handler
   app.use((req, res) => {
