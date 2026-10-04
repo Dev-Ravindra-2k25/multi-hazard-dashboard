@@ -3,6 +3,7 @@ import { Region } from '../models/index.js';
 import { ingestAllWeather } from './weather.js';
 import { ingestAllSeismic } from './seismic.js';
 import { ingestAllRiver } from './river.js';
+import { runScoringCycle } from '../scoring/engine.js';
 
 export async function runIngestionCycle() {
   console.log(`[Ingestion] Starting ingestion cycle at ${new Date().toISOString()}`);
@@ -15,7 +16,8 @@ export async function runIngestionCycle() {
       regionsCount: 0,
       weather: 0,
       seismic: 0,
-      river: 0
+      river: 0,
+      scoring: null
     };
   }
 
@@ -35,15 +37,24 @@ export async function runIngestionCycle() {
     })
   ]);
 
+  // Hook scoring engine right after ingestion
+  let scoringSummary = null;
+  try {
+    scoringSummary = await runScoringCycle();
+  } catch (err) {
+    console.error('[Ingestion] Error running scoring cycle:', err.message);
+  }
+
   const summary = {
     timestamp: new Date().toISOString(),
     regionsCount: regions.length,
     weather: weatherResults.length,
     seismic: seismicResults.length,
-    river: riverResults.length
+    river: riverResults.length,
+    scoring: scoringSummary
   };
 
-  console.log('[Ingestion] Cycle finished successfully:', summary);
+  console.log('[Ingestion] Cycle finished successfully with scoring:', summary);
   return summary;
 }
 
