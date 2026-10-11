@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { Region, Observation, Alert, RiskScore } from '../models/index.js';
+import { Region, Observation, Alert, RiskScore, Config } from '../models/index.js';
 import { notifyAlert } from '../services/alerts.js';
 
 export async function getAdminRegionObservations(req, res, next) {
@@ -82,6 +82,126 @@ export async function createAdminAlert(req, res, next) {
     notifyAlert(alert);
 
     res.status(201).json(alert);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getAdminConfig(req, res, next) {
+  try {
+    const [weightsDoc, thresholdsDoc] = await Promise.all([
+      Config.findOne({ key: 'weights' }),
+      Config.findOne({ key: 'thresholds' })
+    ]);
+
+    const weights = weightsDoc?.value || { flood: 0.4, seismic: 0.3, cyclone: 0.3 };
+    const thresholds = thresholdsDoc?.value || [25, 50, 75];
+
+    res.json({
+      weights,
+      thresholds
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateAdminConfig(req, res, next) {
+  try {
+    const { weights, thresholds } = req.body;
+
+    // 1. Validate weights {flood, seismic, cyclone}
+    if (!weights || typeof weights !== 'object') {
+      return res.status(400).json({ error: 'Weights configuration is required' });
+    }
+
+    const { flood, seismic, cyclone } = weights;
+    if (
+      typeof flood !== 'number' ||
+      typeof seismic !== 'number' ||
+      typeof cyclone !== 'number' ||
+      isNaN(flood) ||
+      isNaN(seismic) ||
+      isNaN(cyclone)
+    ) {
+      return res.status(400).json({ error: 'Weights flood, seismic, and cyclone must be numbers' });
+    }
+
+    if (flood < 0 || flood > 1 || seismic < 0 || seismic > 1 || cyclone < 0 || cyclone > 1) {
+      return res.status(400).json({ error: 'Each weight must be between 0 and 1' });
+    }
+
+    const sum = flood + seismic + cyclone;
+    if (Math.abs(sum - 1) > 0.001) {
+      return res.status(400).json({ error: 'Weights must sum to 1 (tolerance 0.001)' });
+    }
+
+    // 2. Validate thresholds: ascending numbers within 0-100
+    if (!thresholds) {
+      return res.status(400).json({ error: 'Thresholds configuration is required' });
+    }
+
+    let parsedThresholds;
+    if (Array.isArray(thresholds)) {
+      if (thresholds.length !== 3) {
+        return res.status(400).json({ error: 'Thresholds must contain exactly 3 numbers' });
+      }
+      parsedThresholds = thresholds.map(Number);
+    } else if (typeof thresholds === 'object') {
+      if (
+        thresholds.low === undefined ||
+        thresholds.moderate === undefined ||
+        thresholds.high === undefined
+      ) {
+        return res.status(400).json({ error: 'Thresholds must specify low, moderate, and high values' });
+      }
+      parsedThresholds = [
+        Number(thresholds.low),
+        Number(thresholds.moderate),
+        Number(thresholds.high)
+      ];
+    } else {
+      return res.status(400).json({ error: 'Invalid thresholds format' });
+    }
+
+    for (const val of parsedThresholds) {
+      if (typeof val !== 'number' || isNaN(val)) {
+        return res.status(400).json({ error: 'All thresholds must be valid numbers' });
+      }
+      if (val < 0 || val > 100) {
+        return res.status(400).json({ error: 'Thresholds must be between 0 and 100' });
+      }
+    }
+
+    if (
+      !(parsedThresholds[0] < parsedThresholds[1] && parsedThresholds[1] < parsedThresholds[2])
+    ) {
+      return res.status(400).json({ error: 'Thresholds must be ascending numbers within 0-100' });
+    }
+
+    const cleanWeights = {
+      flood: Math.round(flood * 1000) / 1000,
+      seismic: Math.round(seismic * 1000) / 1000,
+      cyclone: Math.round(cyclone * 1000) / 1000
+    };
+
+    await Promise.all([
+      Config.findOneAndUpdate(
+        { key: 'weights' },
+        { value: cleanWeights },
+        { upsert: true, new: true }
+      ),
+      Config.findOneAndUpdate(
+        { key: 'thresholds' },
+        { value: parsedThresholds },
+        { upsert: true, new: true }
+      )
+    ]);
+
+    res.json({
+      weights: cleanWeights,
+      thresholds: parsedThresholds
+    });
   } catch (err) {
     next(err);
   }

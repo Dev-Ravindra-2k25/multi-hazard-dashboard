@@ -5,6 +5,7 @@ import regionsRouter from './routes/regions.js';
 import alertsRouter from './routes/alerts.js';
 import authRouter from './routes/auth.js';
 import adminRouter from './routes/admin.js';
+import exportRouter from './routes/export.js';
 
 export function createApp() {
   const app = express();
@@ -26,6 +27,7 @@ export function createApp() {
   app.use('/api/regions', regionsRouter);
   app.use('/api/alerts', alertsRouter);
   app.use('/api/admin', adminRouter);
+  app.use('/api/export', exportRouter);
 
   // 404 handler
   app.use((req, res) => {

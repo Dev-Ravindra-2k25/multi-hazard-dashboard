@@ -34,6 +34,12 @@ export function Navbar() {
               <Link to="/admin" className="nav-link">
                 Admin Overview
               </Link>
+              <Link to="/admin/alerts" className="nav-link">
+                Alerts
+              </Link>
+              <Link to="/admin/settings" className="nav-link">
+                Settings
+              </Link>
               <span className="user-email">{user?.email || 'Admin'}</span>
               <button onClick={handleLogout} className="btn-logout">
                 Logout

@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/common/Navbar.jsx';
 import Loader from '../components/common/Loader.jsx';
 import ErrorMessage from '../components/common/ErrorMessage.jsx';
 import ScoreCard from '../components/risk/ScoreCard.jsx';
 import HazardBreakdown from '../components/risk/HazardBreakdown.jsx';
 import ShelterList from '../components/shelters/ShelterList.jsx';
+import AlertBanner from '../components/alerts/AlertBanner.jsx';
 import { useRegions } from '../hooks/useRegions.js';
+import { usePolling } from '../hooks/usePolling.js';
+import { getAlerts } from '../api/alerts.js';
 import { getBandConfig } from '../utils/bands.js';
+import { API_BASE } from '../api/client.js';
 
 export function Home() {
   const {
@@ -23,6 +27,72 @@ export function Home() {
   } = useRegions();
 
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeAlert, setActiveAlert] = useState(null);
+  const [lastSeenTimestamp, setLastSeenTimestamp] = useState(null);
+  const [alertLoading, setAlertLoading] = useState(false);
+  const [alertError, setAlertError] = useState(null);
+
+  // Initial alert load for newly selected region
+  useEffect(() => {
+    if (!selectedRegionId) {
+      setActiveAlert(null);
+      setLastSeenTimestamp(null);
+      return;
+    }
+
+    let isMounted = true;
+    async function loadInitialAlert() {
+      try {
+        setAlertLoading(true);
+        setAlertError(null);
+        const alerts = await getAlerts({ regionId: selectedRegionId });
+        if (isMounted) {
+          if (alerts && alerts.length > 0) {
+            setActiveAlert(alerts[0]);
+            setLastSeenTimestamp(alerts[0].createdAt);
+          } else {
+            setActiveAlert(null);
+            setLastSeenTimestamp(new Date().toISOString());
+          }
+        }
+      } catch (err) {
+        if (isMounted) {
+          setAlertError(err.message || 'Failed to check emergency alerts');
+        }
+      } finally {
+        if (isMounted) setAlertLoading(false);
+      }
+    }
+
+    loadInitialAlert();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedRegionId]);
+
+  // Poll for new alerts for selected region every 15 seconds using ?since=
+  const pollAlerts = useCallback(async () => {
+    if (!selectedRegionId || !lastSeenTimestamp) return;
+    try {
+      const newAlerts = await getAlerts({
+        regionId: selectedRegionId,
+        since: lastSeenTimestamp
+      });
+      if (newAlerts && newAlerts.length > 0) {
+        setActiveAlert(newAlerts[0]);
+        setLastSeenTimestamp(newAlerts[0].createdAt);
+      }
+    } catch (err) {
+      console.error('[Alert Polling] Error fetching updates:', err.message);
+    }
+  }, [selectedRegionId, lastSeenTimestamp]);
+
+  usePolling(pollAlerts, 15000, !!selectedRegionId);
+
+  const handleDismissAlert = () => {
+    setActiveAlert(null);
+  };
 
   const filteredRegions = regions.filter((r) =>
     r.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -36,6 +106,13 @@ export function Home() {
       <Navbar />
 
       <main className="main-content">
+        {/* Active Emergency Alert Banner */}
+        <AlertBanner
+          alert={activeAlert}
+          onDismiss={handleDismissAlert}
+          loading={alertLoading}
+          error={alertError}
+        />
         {/* Region Search & Select Bar */}
         <section className="search-bar-section">
           <div className="search-bar-container">
@@ -78,6 +155,18 @@ export function Home() {
               >
                 {isRefreshing ? '🔄 Refreshing...' : '🔄 Refresh'}
               </button>
+
+              {selectedRegionId && (
+                <a
+                  href={`${API_BASE}/export/scores.csv?regionId=${selectedRegionId}`}
+                  className="download-data-link"
+                  download={`scores_${selectedRegion?.name || 'region'}.csv`}
+                  title="Download historical hazard score dataset in CSV format"
+                  id="download-data-link"
+                >
+                  📥 Download data (CSV)
+                </a>
+              )}
             </div>
           </div>
         </section>

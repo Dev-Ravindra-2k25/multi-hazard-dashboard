@@ -6,6 +6,8 @@ import Home from './pages/Home.jsx';
 import Login from './pages/admin/Login.jsx';
 import Overview from './pages/admin/Overview.jsx';
 import RegionDetail from './pages/admin/RegionDetail.jsx';
+import Alerts from './pages/admin/Alerts.jsx';
+import Settings from './pages/admin/Settings.jsx';
 
 function NotFound() {
   return (
@@ -43,6 +45,22 @@ export function App() {
             element={
               <ProtectedRoute>
                 <RegionDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/alerts"
+            element={
+              <ProtectedRoute>
+                <Alerts />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
               </ProtectedRoute>
             }
           />

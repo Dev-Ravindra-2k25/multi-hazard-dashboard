@@ -4,12 +4,13 @@ import { createAutoAlert } from '../services/alerts.js';
 
 const THIRTY_MINUTES_MS = 30 * 60 * 1000;
 const DEFAULT_WEIGHTS = { flood: 0.4, seismic: 0.3, cyclone: 0.3 };
+const DEFAULT_THRESHOLDS = [25, 50, 75];
 
 /**
  * Computes and saves a RiskScore document for a given region.
  * Checks Observation age against 30 minutes threshold to set the stale flag.
  */
-export async function computeRiskScoreForRegion(region, cachedWeights = null) {
+export async function computeRiskScoreForRegion(region, cachedWeights = null, cachedThresholds = null) {
   const now = new Date();
 
   // 1. Fetch latest Observation of each source
@@ -31,11 +32,17 @@ export async function computeRiskScoreForRegion(region, cachedWeights = null) {
   const seismicIdx = seismicIndex(seismicObs?.payload, now);
   const cyclonIdx = cyclonIndex(weatherObs?.payload);
 
-  // 4. Resolve weights
+  // 4. Resolve weights and thresholds
   let weights = cachedWeights;
   if (!weights) {
     const weightsConfig = await Config.findOne({ key: 'weights' });
     weights = weightsConfig?.value || DEFAULT_WEIGHTS;
+  }
+
+  let thresholds = cachedThresholds;
+  if (!thresholds) {
+    const thresholdsConfig = await Config.findOne({ key: 'thresholds' });
+    thresholds = thresholdsConfig?.value || DEFAULT_THRESHOLDS;
   }
 
   const wFlood = typeof weights.flood === 'number' ? weights.flood : DEFAULT_WEIGHTS.flood;
@@ -45,7 +52,7 @@ export async function computeRiskScoreForRegion(region, cachedWeights = null) {
   // 5. Calculate composite score and risk band
   const rawComposite = wFlood * floodIdx + wSeismic * seismicIdx + wCyclone * cyclonIdx;
   const composite = Math.round(Math.min(Math.max(rawComposite, 0), 100) * 100) / 100;
-  const band = bandFor(composite);
+  const band = bandFor(composite, thresholds);
 
   // Fetch previous risk score before saving new one
   const previousRiskScore = await RiskScore.findOne({ regionId: region._id }).sort({ computedAt: -1 });
@@ -91,15 +98,19 @@ export async function runScoringCycle() {
     };
   }
 
-  const weightsConfig = await Config.findOne({ key: 'weights' });
+  const [weightsConfig, thresholdsConfig] = await Promise.all([
+    Config.findOne({ key: 'weights' }),
+    Config.findOne({ key: 'thresholds' })
+  ]);
   const weights = weightsConfig?.value || DEFAULT_WEIGHTS;
+  const thresholds = thresholdsConfig?.value || DEFAULT_THRESHOLDS;
 
   let staleCount = 0;
   const results = [];
 
   for (const region of regions) {
     try {
-      const score = await computeRiskScoreForRegion(region, weights);
+      const score = await computeRiskScoreForRegion(region, weights, thresholds);
       if (score.stale) staleCount++;
       results.push(score);
     } catch (err) {

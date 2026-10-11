@@ -9,6 +9,7 @@ import ScoreHistoryChart from '../../components/risk/ScoreHistoryChart.jsx';
 import { getRegion } from '../../api/regions.js';
 import { getRegionScore, getRegionHistory } from '../../api/scores.js';
 import { getAdminRegionObservations } from '../../api/admin.js';
+import { API_BASE } from '../../api/client.js';
 
 export function RegionDetail() {
   const { id } = useParams();
@@ -54,11 +55,21 @@ export function RegionDetail() {
       <Navbar />
 
       <main className="main-content">
-        <div className="detail-header">
-          <Link to="/admin" className="btn-back">
-            &larr; Back to Admin Overview
-          </Link>
-          <h2>District Drill-Down Analysis</h2>
+        <div className="detail-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <Link to="/admin" className="btn-back">
+              &larr; Back to Admin Overview
+            </Link>
+            <h2>District Drill-Down Analysis {region ? `— ${region.name}` : ''}</h2>
+          </div>
+          <a
+            href={`${API_BASE}/export/scores.csv?regionId=${id}`}
+            className="btn-download-csv"
+            download={`scores_${region?.name || id}.csv`}
+            id="download-csv-btn"
+          >
+            📥 Download CSV
+          </a>
         </div>
 
         {loading && <Loader message="Fetching region observations and score history..." />}

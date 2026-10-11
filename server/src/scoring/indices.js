@@ -87,14 +87,31 @@ export function cyclonIndex(weatherPayload = {}) {
 // Alias for convenience
 export const cycloneIndex = cyclonIndex;
 
+export const DEFAULT_THRESHOLDS = [25, 50, 75];
+
 /**
  * Maps composite score (0-100) to risk band:
- * Low 0-25, Moderate 26-50, High 51-75, Severe 76-100.
+ * Low 0-t1, Moderate (t1+1)-t2, High (t2+1)-t3, Severe (t3+1)-100.
+ * Defaults to: Low 0-25, Moderate 26-50, High 51-75, Severe 76-100.
  */
-export function bandFor(score) {
+export function bandFor(score, thresholds = DEFAULT_THRESHOLDS) {
   const val = Number(score) || 0;
-  if (val <= 25) return 'Low';
-  if (val <= 50) return 'Moderate';
-  if (val <= 75) return 'High';
+  let t1 = 25;
+  let t2 = 50;
+  let t3 = 75;
+
+  if (Array.isArray(thresholds) && thresholds.length >= 3) {
+    t1 = Number(thresholds[0]);
+    t2 = Number(thresholds[1]);
+    t3 = Number(thresholds[2]);
+  } else if (thresholds && typeof thresholds === 'object') {
+    if (thresholds.low !== undefined) t1 = Number(thresholds.low);
+    if (thresholds.moderate !== undefined) t2 = Number(thresholds.moderate);
+    if (thresholds.high !== undefined) t3 = Number(thresholds.high);
+  }
+
+  if (val <= t1) return 'Low';
+  if (val <= t2) return 'Moderate';
+  if (val <= t3) return 'High';
   return 'Severe';
 }
