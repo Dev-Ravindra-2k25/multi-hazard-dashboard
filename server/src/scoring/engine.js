@@ -1,5 +1,6 @@
 import { Region, Observation, RiskScore, Config } from '../models/index.js';
 import { floodIndex, seismicIndex, cyclonIndex, bandFor } from './indices.js';
+import { createAutoAlert } from '../services/alerts.js';
 
 const THIRTY_MINUTES_MS = 30 * 60 * 1000;
 const DEFAULT_WEIGHTS = { flood: 0.4, seismic: 0.3, cyclone: 0.3 };
@@ -46,6 +47,9 @@ export async function computeRiskScoreForRegion(region, cachedWeights = null) {
   const composite = Math.round(Math.min(Math.max(rawComposite, 0), 100) * 100) / 100;
   const band = bandFor(composite);
 
+  // Fetch previous risk score before saving new one
+  const previousRiskScore = await RiskScore.findOne({ regionId: region._id }).sort({ computedAt: -1 });
+
   // 6. Save RiskScore document
   const riskScore = await RiskScore.create({
     regionId: region._id,
@@ -57,6 +61,15 @@ export async function computeRiskScoreForRegion(region, cachedWeights = null) {
     stale,
     computedAt: now
   });
+
+  // 7. Check and trigger auto alert if band escalated into High or Severe
+  if (previousRiskScore) {
+    try {
+      await createAutoAlert(region._id, riskScore.band, previousRiskScore.band);
+    } catch (alertErr) {
+      console.error(`[Scoring] Failed to create auto alert for ${region.name}:`, alertErr.message);
+    }
+  }
 
   return riskScore;
 }
