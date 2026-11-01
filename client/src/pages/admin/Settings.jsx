@@ -161,7 +161,7 @@ export function Settings() {
             <form onSubmit={handleSave} className="settings-form">
               {/* Card 1: Hazard Weights */}
               <div className="alert-form-card" style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="settings-card-header">
                   <h3 className="card-title">⚖️ Composite Formula Weights</h3>
                   <div
                     id="weights-total"
@@ -183,7 +183,7 @@ export function Settings() {
                   Weights determine the contribution of each hazard index to the composite score (0.0 to 1.0).
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+                <div className="settings-inputs-grid">
                   <div className="form-group">
                     <label htmlFor="weight-flood" className="form-label" style={{ fontWeight: 600 }}>
                       🌊 Flood Weight
@@ -247,7 +247,7 @@ export function Settings() {
                   Cutoff boundaries defining the four risk bands (must be strictly ascending numbers within 0-100).
                 </p>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
+                <div className="settings-inputs-grid">
                   <div className="form-group">
                     <label htmlFor="thresh-low" className="form-label" style={{ fontWeight: 600 }}>
                       🟢 Low / Moderate Cutoff

@@ -1600,3 +1600,473 @@ body {
   }
 }
 
+/* Slice 12: Mobile Polish & Comprehensive Responsiveness */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.detail-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin: 0;
+  word-break: break-word;
+}
+
+.settings-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.25rem;
+}
+
+.settings-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.error-boundary-container {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.error-boundary-card {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+
+.error-boundary-icon {
+  font-size: 2.5rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.error-boundary-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.error-boundary-desc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.error-boundary-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+/* Touch targets and iOS form auto-zoom prevention */
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea,
+  .search-input,
+  .region-dropdown,
+  .form-input,
+  .form-select,
+  .chatbox-input,
+  .draft-select {
+    font-size: 16px !important; /* Critical: stops iOS Safari from auto-zooming and breaking viewport */
+  }
+}
+
+/* Mobile Layout (Screens <= 640px) */
+@media (max-width: 640px) {
+  .main-content {
+    padding: 0.75rem 0.5rem;
+  }
+
+  /* Navbar */
+  .navbar {
+    padding: 0.75rem 0.75rem;
+  }
+
+  .navbar-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .navbar-brand {
+    gap: 0.5rem;
+  }
+
+  .navbar-icon {
+    font-size: 1.5rem;
+  }
+
+  .navbar-title {
+    font-size: 0.98rem;
+    line-height: 1.25;
+    word-break: break-word;
+  }
+
+  .navbar-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .navbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
+  .nav-link {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.82rem;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+  }
+
+  .btn-admin-login {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 1rem;
+  }
+
+  .btn-logout {
+    padding: 0.35rem 0.65rem;
+  }
+
+  .user-email {
+    display: none;
+  }
+
+  /* Search & Controls */
+  .search-bar-section {
+    padding: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .search-inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .search-input,
+  .region-dropdown {
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  .btn-refresh,
+  .download-data-link,
+  .btn-broadcast-alert,
+  .btn-chat-send,
+  .btn-explain-score,
+  .btn-back,
+  .btn-download-csv,
+  .btn-save-settings {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /* Grid Layouts */
+  .grid-row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .score-card,
+  .hazard-breakdown-card,
+  .guidance-card,
+  .shelter-card,
+  .map-card,
+  .table-card,
+  .alert-form-card,
+  .alert-log-card,
+  .observations-card,
+  .history-chart-card,
+  .login-card {
+    padding: 1rem 0.85rem;
+  }
+
+  /* ScoreCard Details */
+  .score-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .region-title {
+    font-size: 1.3rem;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+
+  .score-card-badges {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    align-self: flex-start;
+  }
+
+  .score-display-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-top: 0.75rem;
+  }
+
+  .score-gauge {
+    font-size: 2.75rem;
+  }
+
+  .score-info {
+    width: 100%;
+  }
+
+  .score-description {
+    font-size: 0.82rem;
+  }
+
+  /* AI Explanation */
+  .ai-explanation-card {
+    padding: 0.85rem;
+  }
+
+  .ai-explanation-text {
+    font-size: 0.88rem;
+  }
+
+  /* ChatBox */
+  .chatbox-chips {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.4rem;
+    padding: 0.5rem 0.6rem;
+    scrollbar-width: none;
+  }
+
+  .chatbox-chips::-webkit-scrollbar {
+    display: none;
+  }
+
+  .chip-btn {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    padding: 0.35rem 0.65rem;
+    white-space: nowrap;
+  }
+
+  .chatbox-messages {
+    max-height: 220px;
+    padding: 0.75rem;
+  }
+
+  .chat-bubble {
+    max-width: 92%;
+  }
+
+  .chatbox-input-container {
+    padding: 0.5rem 0.6rem;
+    gap: 0.4rem;
+  }
+
+  .chatbox-input {
+    padding: 0.5rem 3.5rem 0.5rem 0.6rem;
+    min-height: 44px;
+  }
+
+  /* Hazard Breakdown & Indices */
+  .chart-container {
+    height: 190px;
+  }
+
+  .indices-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+  }
+
+  .index-stat {
+    padding: 0.4rem 0.2rem;
+  }
+
+  .index-label {
+    font-size: 0.68rem;
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .index-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+
+  /* Evacuation & Shelters */
+  .guidance-header,
+  .shelter-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .shelter-item {
+    padding: 0.6rem 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .shelter-name {
+    font-size: 0.9rem;
+  }
+
+  .shelter-meta,
+  .shelter-coords {
+    font-size: 0.78rem;
+  }
+
+  /* Admin Alert Form & Controls */
+  .admin-header,
+  .detail-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .detail-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .ai-draft-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .draft-control-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .draft-select {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .btn-draft-ai {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .alert-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* Leaflet Map */
+  .leaflet-map-container {
+    height: 280px;
+    border-radius: 8px;
+  }
+
+  /* Responsive Tables */
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+  }
+
+  .admin-table,
+  .alerts-table {
+    min-width: 580px;
+  }
+
+  .admin-table th,
+  .admin-table td,
+  .alerts-table th,
+  .alerts-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .admin-table td:nth-child(6),
+  .alerts-table td:last-child {
+    white-space: normal;
+    min-width: 150px;
+  }
+}
+
+/* Extra small screens (<= 380px) */
+@media (max-width: 380px) {
+  .indices-grid {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  .index-stat {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .index-label {
+    font-size: 0.8rem;
+  }
+}
+
+

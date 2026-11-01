@@ -34,6 +34,10 @@ export function RegionMap({ regions }) {
 
           const bandConfig = getBandConfig(region.band || 'Low');
           const composite = region.composite !== null && region.composite !== undefined ? region.composite : 'N/A';
+          const isStale = Boolean(region.stale);
+          const staleBadgeHtml = isStale
+            ? `<span style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-left: 4px;" title="Data may be cached or outdated">⏳ Stale</span>`
+            : '';
 
           const circle = L.circleMarker(latLng, {
             radius: 12,
@@ -50,6 +54,7 @@ export function RegionMap({ regions }) {
               <p style="margin: 0 0 8px 0; font-size: 0.9rem;">
                 Composite Risk: <strong style="color: ${bandConfig.color}; font-size: 1.05rem;">${composite}</strong> 
                 <span style="background: ${bandConfig.bg}; color: ${bandConfig.text}; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; margin-left: 4px;">${bandConfig.name}</span>
+                ${staleBadgeHtml}
               </p>
               <a href="/admin/regions/${region._id}" style="display: inline-block; background: #2563eb; color: #fff; text-decoration: none; padding: 4px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">
                 Drill-Down Details &rarr;

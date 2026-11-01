@@ -43,7 +43,7 @@ export async function generateText({ system, prompt, maxTokens = 300 } = {}) {
     const llmCall = (async () => {
       if (provider === 'gemini' || provider === 'google') {
         const ai = new GoogleGenAI({ apiKey });
-        const geminiModel = model || 'gemini-1.5-flash';
+        const geminiModel = model || 'gemini-3.6-flash';
         const response = await ai.models.generateContent({
           model: geminiModel,
           contents: prompt,

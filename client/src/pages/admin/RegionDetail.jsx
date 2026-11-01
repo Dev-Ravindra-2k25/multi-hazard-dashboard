@@ -55,12 +55,12 @@ export function RegionDetail() {
       <Navbar />
 
       <main className="main-content">
-        <div className="detail-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="detail-header">
+          <div className="detail-header-left">
             <Link to="/admin" className="btn-back">
               &larr; Back to Admin Overview
             </Link>
-            <h2>District Drill-Down Analysis {region ? `— ${region.name}` : ''}</h2>
+            <h2 className="detail-title">District Drill-Down Analysis {region ? `— ${region.name}` : ''}</h2>
           </div>
           <a
             href={`${API_BASE}/export/scores.csv?regionId=${id}`}
@@ -74,6 +74,16 @@ export function RegionDetail() {
 
         {loading && <Loader message="Fetching region observations and score history..." />}
         {error && <ErrorMessage message={error} onRetry={fetchDetailData} />}
+
+        {!loading && !region && !error && (
+          <div className="empty-state-card" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+            <h3>District Not Found</h3>
+            <p>No data or records exist for the requested district ID.</p>
+            <Link to="/admin" className="btn-back" style={{ marginTop: '1rem', display: 'inline-block' }}>
+              &larr; Return to Admin Overview
+            </Link>
+          </div>
+        )}
 
         {!loading && region && (
           <div className="detail-grid">

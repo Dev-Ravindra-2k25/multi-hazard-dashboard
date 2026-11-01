@@ -12,9 +12,10 @@
 - Slice 9: history + export (CSV export streaming with cursor, admin config weights & band thresholds endpoints, dynamic scoring engine, Settings page, CSV download on RegionDetail & Home)
 - Slice 10: AI features (deterministic rule, ai/llm.js with 15s timeout & 300 token cap, ai/explain.js & cached POST /api/ai/explain/:scoreId, ai/alertDraft.js & POST /api/admin/ai/draft-alert with untrusted input validation, citizen AiExplanation component, admin AlertForm Draft with AI, Jest tests)
 - Slice 11: Citizen assistant (read-only assistant, ai/assistant.js with maxTokens 250, delimited DATA block with prompt defense, POST /api/ai/assistant with 10/min and 100/day IP rate limit, ChatBox component with suggestion chips, 300-char counter, emergency disclaimer, Jest tests)
+- Slice 12: Polish + deploy (Server hardening with helmet, CORS CLIENT_ORIGIN, trust proxy, startup config validation, production error handler, cold-start catch-up, scripts/createAdmin.js, ErrorBoundary, loading/empty/error states, consistent stale-data badges, mobile 375px responsive styles, page metadata & SVG favicon, vercel.json SPA rewrites, comprehensive README.md and complete test suite)
 
 ## Next
-- Polish + Deploy (error states, stale-data badge, mobile layout check, deployment config for Render and Vercel, final README)
+- None (All 12 slices complete!)
 
 ## Known issues
 - none

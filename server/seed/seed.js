@@ -31,8 +31,12 @@ export async function seedDatabase(customUri = null) {
     // 2. Clear collections
     await Region.deleteMany({});
     await Shelter.deleteMany({});
-    await User.deleteMany({ role: 'admin' });
     await Config.deleteOne({ key: 'weights' });
+
+    const isProduction = process.env.NODE_ENV === 'production' || config.nodeEnv === 'production';
+    if (!isProduction) {
+      await User.deleteMany({ role: 'admin' });
+    }
 
     // 3. Insert Regions
     const insertedRegions = await Region.insertMany(regionsData);
@@ -54,16 +58,20 @@ export async function seedDatabase(customUri = null) {
     });
     const insertedShelters = await Shelter.insertMany(shelterDocs);
 
-    // 5. Create Default Admin User
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@hazard.gov.in';
-    const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
-    const passwordHash = await bcrypt.hash(adminPassword, 10);
+    // 5. Create Default Admin User only when NOT in production
+    let adminEmailResult = null;
+    if (!isProduction) {
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@hazard.gov.in';
+      const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
+      const passwordHash = await bcrypt.hash(adminPassword, 10);
 
-    const adminUser = await User.create({
-      email: adminEmail,
-      passwordHash,
-      role: 'admin'
-    });
+      const adminUser = await User.create({
+        email: adminEmail,
+        passwordHash,
+        role: 'admin'
+      });
+      adminEmailResult = adminUser.email;
+    }
 
     // 6. Create Default Config (weights 0.4/0.3/0.3)
     const defaultConfig = await Config.create({
@@ -81,7 +89,7 @@ export async function seedDatabase(customUri = null) {
     return {
       regionsCount: insertedRegions.length,
       sheltersCount: insertedShelters.length,
-      adminEmail: adminUser.email,
+      adminEmail: adminEmailResult,
       configKey: defaultConfig.key
     };
   } finally {

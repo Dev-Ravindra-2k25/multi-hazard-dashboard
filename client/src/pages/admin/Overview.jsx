@@ -71,8 +71,15 @@ export function Overview() {
                     </tr>
                   </thead>
                   <tbody>
-                    {regions.map((region) => (
-                      <tr key={region._id}>
+                    {regions.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                          No monitored regions found. Run seed script to populate districts.
+                        </td>
+                      </tr>
+                    ) : (
+                      regions.map((region) => (
+                        <tr key={region._id}>
                         <td className="font-bold">{region.name}</td>
                         <td className="text-muted">
                           {region.location.lat.toFixed(2)}°, {region.location.lon.toFixed(2)}°
@@ -93,7 +100,8 @@ export function Overview() {
                           </Link>
                         </td>
                       </tr>
-                    ))}
+                    ))
+                  )}
                   </tbody>
                 </table>
               </div>
