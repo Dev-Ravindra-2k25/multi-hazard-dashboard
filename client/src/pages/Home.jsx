@@ -3,6 +3,7 @@ import Navbar from '../components/common/Navbar.jsx';
 import Loader from '../components/common/Loader.jsx';
 import ErrorMessage from '../components/common/ErrorMessage.jsx';
 import ScoreCard from '../components/risk/ScoreCard.jsx';
+import AiExplanation from '../components/risk/AiExplanation.jsx';
 import HazardBreakdown from '../components/risk/HazardBreakdown.jsx';
 import ShelterList from '../components/shelters/ShelterList.jsx';
 import AlertBanner from '../components/alerts/AlertBanner.jsx';
@@ -182,7 +183,10 @@ export function Home() {
           <div className="dashboard-grid">
             {/* Top Row: Score Card & Hazard Breakdown */}
             <div className="grid-row">
-              <ScoreCard region={selectedRegion} score={score} />
+              <div className="score-column">
+                <ScoreCard region={selectedRegion} score={score} />
+                <AiExplanation score={score} />
+              </div>
               <HazardBreakdown score={score} />
             </div>
 

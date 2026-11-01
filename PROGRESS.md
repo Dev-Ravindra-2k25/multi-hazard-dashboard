@@ -10,9 +10,10 @@
 - Slice 7: auth + admin UI (JWT 8h login, rate limiting, Leaflet map overview, region drill-down, history chart, tests)
 - Slice 8: alerts (auto alert on band change to High/Severe, 60-min deduplication, manual alert endpoint, admin form & log, stub notifier, citizen polling every 15s)
 - Slice 9: history + export (CSV export streaming with cursor, admin config weights & band thresholds endpoints, dynamic scoring engine, Settings page, CSV download on RegionDetail & Home)
+- Slice 10: AI features (deterministic rule, ai/llm.js with 15s timeout & 300 token cap, ai/explain.js & cached POST /api/ai/explain/:scoreId, ai/alertDraft.js & POST /api/admin/ai/draft-alert with untrusted input validation, citizen AiExplanation component, admin AlertForm Draft with AI, Jest tests)
 
 ## Next
-- Slice 10: Polish + Deploy (error states, stale-data badge, mobile layout check, deployment config for Render and Vercel, final README)
+- Slice 11: Polish + Deploy (error states, stale-data badge, mobile layout check, deployment config for Render and Vercel, final README)
 
 ## Known issues
 - none

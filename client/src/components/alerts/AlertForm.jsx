@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createAdminAlert } from '../../api/alerts.js';
+import { draftAiAlert } from '../../api/ai.js';
 
 export function AlertForm({ regions = [], onAlertSent }) {
   const [regionId, setRegionId] = useState('');
@@ -8,6 +9,13 @@ export function AlertForm({ regions = [], onAlertSent }) {
   const [success, setSuccess] = useState(null);
   const [error, setError] = useState(null);
 
+  // AI draft states
+  const [tone, setTone] = useState('urgent');
+  const [language, setLanguage] = useState('en');
+  const [drafting, setDrafting] = useState(false);
+  const [draftError, setDraftError] = useState(null);
+  const [isAiDraft, setIsAiDraft] = useState(false);
+
   const MAX_CHARS = 500;
 
   useEffect(() => {
@@ -15,6 +23,31 @@ export function AlertForm({ regions = [], onAlertSent }) {
       setRegionId(regions[0]._id);
     }
   }, [regions, regionId]);
+
+  const handleDraftWithAi = async () => {
+    if (!regionId) {
+      setError('Please select a target region first.');
+      return;
+    }
+
+    try {
+      setDrafting(true);
+      setDraftError(null);
+      setError(null);
+
+      const res = await draftAiAlert({ regionId, tone, language });
+      if (res?.draft) {
+        setMessage(res.draft);
+        setIsAiDraft(true);
+      } else {
+        setDraftError('Failed to generate draft. Please try again.');
+      }
+    } catch (err) {
+      setDraftError(err.message || 'AI alert drafting unavailable');
+    } finally {
+      setDrafting(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -46,6 +79,7 @@ export function AlertForm({ regions = [], onAlertSent }) {
 
       setSuccess('Alert broadcasted successfully! Citizens in this region will be alerted.');
       setMessage('');
+      setIsAiDraft(false);
       if (onAlertSent) {
         onAlertSent(createdAlert);
       }
@@ -102,7 +136,10 @@ export function AlertForm({ regions = [], onAlertSent }) {
             id="alert-region-select"
             className="form-select"
             value={regionId}
-            onChange={(e) => setRegionId(e.target.value)}
+            onChange={(e) => {
+              setRegionId(e.target.value);
+              setIsAiDraft(false);
+            }}
             disabled={loading}
           >
             {regions.length === 0 ? (
@@ -117,6 +154,59 @@ export function AlertForm({ regions = [], onAlertSent }) {
           </select>
         </div>
 
+        {/* AI Alert Drafting Controls */}
+        <div className="ai-draft-section">
+          <div className="ai-draft-header">
+            <span className="ai-sparkle">✨</span>
+            <span className="ai-draft-title">AI Alert Drafter (Assisted Broadcast)</span>
+          </div>
+          <div className="ai-draft-controls">
+            <div className="draft-control-item">
+              <label htmlFor="draft-tone-select" className="draft-control-label">Tone:</label>
+              <select
+                id="draft-tone-select"
+                className="draft-select"
+                value={tone}
+                onChange={(e) => setTone(e.target.value)}
+                disabled={drafting || loading}
+              >
+                <option value="urgent">Urgent</option>
+                <option value="calm">Calm</option>
+                <option value="formal">Formal</option>
+              </select>
+            </div>
+
+            <div className="draft-control-item">
+              <label htmlFor="draft-language-select" className="draft-control-label">Language:</label>
+              <select
+                id="draft-language-select"
+                className="draft-select"
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                disabled={drafting || loading}
+              >
+                <option value="en">English (en)</option>
+                <option value="hi">Hindi (hi)</option>
+                <option value="ta">Tamil (ta)</option>
+                <option value="te">Telugu (te)</option>
+                <option value="bn">Bengali (bn)</option>
+                <option value="mr">Marathi (mr)</option>
+              </select>
+            </div>
+
+            <button
+              type="button"
+              id="btn-draft-ai"
+              className="btn-draft-ai"
+              onClick={handleDraftWithAi}
+              disabled={drafting || loading || !regionId}
+            >
+              {drafting ? '🤖 Drafting...' : '✨ Draft with AI'}
+            </button>
+          </div>
+          {draftError && <p className="ai-draft-error-text">⚠️ {draftError}</p>}
+        </div>
+
         <div className="form-group">
           <div className="label-with-counter">
             <label htmlFor="alert-message" className="form-label">
@@ -128,6 +218,12 @@ export function AlertForm({ regions = [], onAlertSent }) {
               {message.length} / {MAX_CHARS} characters
             </span>
           </div>
+
+          {isAiDraft && (
+            <div className="ai-draft-note" role="note">
+              ℹ️ AI draft: review before sending
+            </div>
+          )}
 
           <textarea
             id="alert-message"

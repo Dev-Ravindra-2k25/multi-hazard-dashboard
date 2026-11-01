@@ -6,6 +6,7 @@ import alertsRouter from './routes/alerts.js';
 import authRouter from './routes/auth.js';
 import adminRouter from './routes/admin.js';
 import exportRouter from './routes/export.js';
+import aiRouter from './routes/ai.js';
 
 export function createApp() {
   const app = express();
@@ -28,6 +29,7 @@ export function createApp() {
   app.use('/api/alerts', alertsRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/export', exportRouter);
+  app.use('/api/ai', aiRouter);
 
   // 404 handler
   app.use((req, res) => {
