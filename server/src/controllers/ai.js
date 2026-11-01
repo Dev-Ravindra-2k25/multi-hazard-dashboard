@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { RiskScore, Region } from '../models/index.js';
 import { generateExplanation } from '../ai/explain.js';
 import { draftAlert, VALID_TONES, VALID_LANGUAGES } from '../ai/alertDraft.js';
+import { answerCitizenQuestion } from '../ai/assistant.js';
 
 /**
  * POST /api/ai/explain/:scoreId
@@ -101,7 +102,54 @@ export async function draftAlertHandler(req, res, next) {
   }
 }
 
+/**
+ * POST /api/ai/assistant
+ * Public read-only endpoint for answering citizen hazard questions grounded strictly
+ * on the specified region's data.
+ */
+export async function handleAssistantQuestion(req, res, next) {
+  try {
+    const { regionId, question } = req.body;
+
+    // 1. Validate regionId ObjectId
+    if (!regionId || !mongoose.Types.ObjectId.isValid(regionId)) {
+      return res.status(400).json({ error: 'Invalid or missing region ID' });
+    }
+
+    // 2. Validate question string & bounds
+    if (!question || typeof question !== 'string' || question.trim().length === 0) {
+      return res.status(400).json({ error: 'Question is required' });
+    }
+
+    const trimmedQuestion = question.trim();
+    if (trimmedQuestion.length > 300) {
+      return res.status(400).json({ error: 'Question exceeds maximum limit of 300 characters' });
+    }
+
+    // 3. Verify region exists
+    const region = await Region.findById(regionId);
+    if (!region) {
+      return res.status(404).json({ error: 'Region not found' });
+    }
+
+    // 4. Generate grounded answer
+    const answer = await answerCitizenQuestion({
+      regionId,
+      question: trimmedQuestion
+    });
+
+    if (!answer) {
+      return res.status(503).json({ error: 'AI assistant service currently unavailable' });
+    }
+
+    return res.status(200).json({ answer });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export default {
   explainScore,
-  draftAlertHandler
+  draftAlertHandler,
+  handleAssistantQuestion
 };

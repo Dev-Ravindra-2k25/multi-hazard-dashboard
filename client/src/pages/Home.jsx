@@ -4,6 +4,7 @@ import Loader from '../components/common/Loader.jsx';
 import ErrorMessage from '../components/common/ErrorMessage.jsx';
 import ScoreCard from '../components/risk/ScoreCard.jsx';
 import AiExplanation from '../components/risk/AiExplanation.jsx';
+import ChatBox from '../components/assistant/ChatBox.jsx';
 import HazardBreakdown from '../components/risk/HazardBreakdown.jsx';
 import ShelterList from '../components/shelters/ShelterList.jsx';
 import AlertBanner from '../components/alerts/AlertBanner.jsx';
@@ -186,6 +187,7 @@ export function Home() {
               <div className="score-column">
                 <ScoreCard region={selectedRegion} score={score} />
                 <AiExplanation score={score} />
+                <ChatBox region={selectedRegion} />
               </div>
               <HazardBreakdown score={score} />
             </div>

@@ -3,13 +3,13 @@ import mongoose from 'mongoose';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { app } from '../src/app.js';
-import { Region, RiskScore, Alert, User } from '../src/models/index.js';
+import { Region, RiskScore, Alert, User, Shelter, Observation, Config } from '../src/models/index.js';
 import llm from '../src/ai/llm.js';
 import { config } from '../src/config.js';
 
 const TEST_DB_URI = process.env.MONGODB_TEST_URI || 'mongodb://localhost:27017/hazard_dashboard_test';
 
-describe('Slice 10: AI Features (Explain Score & Alert Draft)', () => {
+describe('AI Features (Slice 10: Explain & Alert Draft, Slice 11: Citizen Assistant)', () => {
   let sampleRegion;
   let sampleScore;
   let adminUser;
@@ -36,6 +36,9 @@ describe('Slice 10: AI Features (Explain Score & Alert Draft)', () => {
     await RiskScore.deleteMany({});
     await Alert.deleteMany({});
     await User.deleteMany({});
+    await Shelter.deleteMany({});
+    await Observation.deleteMany({});
+    await Config.deleteMany({});
 
     sampleRegion = await Region.create({
       name: 'Puri',
@@ -287,6 +290,214 @@ describe('Slice 10: AI Features (Explain Score & Alert Draft)', () => {
 
       const alertCount = await Alert.countDocuments();
       expect(alertCount).toBe(0);
+    });
+  });
+
+  describe('3. Citizen Assistant (POST /api/ai/assistant)', () => {
+    it('returns 400 for an invalid id, empty question, and a 301-character question', async () => {
+      // 1. Invalid ID
+      const resInvalidId = await request(app)
+        .post('/api/ai/assistant')
+        .send({
+          regionId: 'not-an-object-id',
+          question: 'Where is the shelter?'
+        });
+      expect(resInvalidId.statusCode).toBe(400);
+      expect(resInvalidId.body).toHaveProperty('error');
+      expect(resInvalidId.body.error).toContain('Invalid or missing region ID');
+
+      // 2. Empty question
+      const resEmpty = await request(app)
+        .post('/api/ai/assistant')
+        .send({
+          regionId: sampleRegion._id,
+          question: '   '
+        });
+      expect(resEmpty.statusCode).toBe(400);
+      expect(resEmpty.body).toHaveProperty('error');
+      expect(resEmpty.body.error).toContain('Question is required');
+
+      // 3. 301-character question
+      const longQuestion = 'Q'.repeat(301);
+      const resLong = await request(app)
+        .post('/api/ai/assistant')
+        .send({
+          regionId: sampleRegion._id,
+          question: longQuestion
+        });
+      expect(resLong.statusCode).toBe(400);
+      expect(resLong.body).toHaveProperty('error');
+      expect(resLong.body.error).toContain('Question exceeds maximum limit of 300 characters');
+    });
+
+    it('returns 404 for an unknown region', async () => {
+      const nonExistentRegionId = new mongoose.Types.ObjectId();
+      const res = await request(app)
+        .post('/api/ai/assistant')
+        .send({
+          regionId: nonExistentRegionId,
+          question: 'What is the current risk?'
+        });
+      expect(res.statusCode).toBe(404);
+      expect(res.body).toHaveProperty('error', 'Region not found');
+    });
+
+    it('returns 503 when the LLM returns null', async () => {
+      jest.spyOn(llm, 'generateText').mockResolvedValue(null);
+
+      const res = await request(app)
+        .post('/api/ai/assistant')
+        .send({
+          regionId: sampleRegion._id,
+          question: 'What does this risk level mean?'
+        });
+
+      expect(res.statusCode).toBe(503);
+      expect(res.body).toHaveProperty('error');
+      expect(res.body.error).toContain('unavailable');
+    });
+
+    it('the prompt sent to the LLM contains the requested region’s data and not another region’s', async () => {
+      const otherRegion = await Region.create({
+        name: 'Wayanad',
+        location: { lat: 11.6854, lon: 76.132 },
+        population: 817420
+      });
+      await RiskScore.create({
+        regionId: otherRegion._id,
+        floodIdx: 88,
+        seismicIdx: 12,
+        cyclonIdx: 20,
+        composite: 52,
+        band: 'High'
+      });
+      await Shelter.create({
+        regionId: sampleRegion._id,
+        name: 'Puri Beach Cyclone Shelter',
+        location: { lat: 19.81, lon: 85.83 },
+        capacity: 500
+      });
+      await Shelter.create({
+        regionId: otherRegion._id,
+        name: 'Wayanad Hilltop Shelter',
+        location: { lat: 11.68, lon: 76.13 },
+        capacity: 300
+      });
+
+      const generateSpy = jest.spyOn(llm, 'generateText').mockResolvedValue('Puri has 1 shelter at Puri Beach.');
+
+      const res = await request(app)
+        .post('/api/ai/assistant')
+        .send({
+          regionId: sampleRegion._id,
+          question: 'Where is the nearest shelter?'
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty('answer', 'Puri has 1 shelter at Puri Beach.');
+      expect(generateSpy).toHaveBeenCalledTimes(1);
+
+      const callArgs = generateSpy.mock.calls[0][0];
+      // Contains requested region's data
+      expect(callArgs.prompt).toContain('Puri');
+      expect(callArgs.prompt).toContain('Puri Beach Cyclone Shelter');
+
+      // Does NOT contain other region's data
+      expect(callArgs.prompt).not.toContain('Wayanad');
+      expect(callArgs.prompt).not.toContain('Wayanad Hilltop Shelter');
+    });
+
+    it('the user’s question is not placed inside the system prompt', async () => {
+      const uniqueUserQuestion = 'SPECIAL_TEST_QUESTION_IS_IT_SAFE_TO_TRAVEL_123';
+      const generateSpy = jest.spyOn(llm, 'generateText').mockResolvedValue('Avoid low ground.');
+
+      const res = await request(app)
+        .post('/api/ai/assistant')
+        .send({
+          regionId: sampleRegion._id,
+          question: uniqueUserQuestion
+        });
+
+      expect(res.statusCode).toBe(200);
+      expect(generateSpy).toHaveBeenCalledTimes(1);
+
+      const callArgs = generateSpy.mock.calls[0][0];
+      // User's question is NOT placed inside system prompt
+      expect(callArgs.system).not.toContain(uniqueUserQuestion);
+      // User's question is in the user prompt
+      expect(callArgs.prompt).toContain(uniqueUserQuestion);
+      // maxTokens is set to 250
+      expect(callArgs.maxTokens).toBe(250);
+    });
+
+    it('no documents are created or changed in any collection', async () => {
+      jest.spyOn(llm, 'generateText').mockResolvedValue('Advisory answer text.');
+
+      const regionsBefore = await Region.countDocuments();
+      const scoresBefore = await RiskScore.countDocuments();
+      const alertsBefore = await Alert.countDocuments();
+      const usersBefore = await User.countDocuments();
+      const sheltersBefore = await Shelter.countDocuments();
+      const obsBefore = await Observation.countDocuments();
+      const configsBefore = await Config.countDocuments();
+
+      const scoreBeforeDoc = await RiskScore.findById(sampleScore._id).lean();
+
+      const res = await request(app)
+        .post('/api/ai/assistant')
+        .send({
+          regionId: sampleRegion._id,
+          question: 'What should I do now?'
+        });
+
+      expect(res.statusCode).toBe(200);
+
+      const regionsAfter = await Region.countDocuments();
+      const scoresAfter = await RiskScore.countDocuments();
+      const alertsAfter = await Alert.countDocuments();
+      const usersAfter = await User.countDocuments();
+      const sheltersAfter = await Shelter.countDocuments();
+      const obsAfter = await Observation.countDocuments();
+      const configsAfter = await Config.countDocuments();
+
+      expect(regionsAfter).toBe(regionsBefore);
+      expect(scoresAfter).toBe(scoresBefore);
+      expect(alertsAfter).toBe(alertsBefore);
+      expect(usersAfter).toBe(usersBefore);
+      expect(sheltersAfter).toBe(sheltersBefore);
+      expect(obsAfter).toBe(obsBefore);
+      expect(configsAfter).toBe(configsBefore);
+
+      const scoreAfterDoc = await RiskScore.findById(sampleScore._id).lean();
+      expect(scoreAfterDoc).toEqual(scoreBeforeDoc);
+    });
+
+    it('returns 429 after the rate limit is exceeded', async () => {
+      jest.spyOn(llm, 'generateText').mockResolvedValue('Factual response.');
+
+      let hit429 = false;
+      let errorResponse = null;
+
+      // Send requests until the 10 requests per minute limit triggers 429
+      for (let i = 0; i < 15; i++) {
+        const res = await request(app)
+          .post('/api/ai/assistant')
+          .send({
+            regionId: sampleRegion._id,
+            question: `Rate limit test question ${i}`
+          });
+
+        if (res.statusCode === 429) {
+          hit429 = true;
+          errorResponse = res;
+          break;
+        }
+      }
+
+      expect(hit429).toBe(true);
+      expect(errorResponse.statusCode).toBe(429);
+      expect(errorResponse.body).toHaveProperty('error');
+      expect(errorResponse.body.error).toContain('limit');
     });
   });
 });

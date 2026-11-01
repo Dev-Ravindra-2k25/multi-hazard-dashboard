@@ -30,7 +30,24 @@ export async function draftAiAlert({ regionId, tone, language }) {
   });
 }
 
+/**
+ * Ask a citizen question to the AI assistant for a specific region.
+ * Public endpoint.
+ * 
+ * @param {Object} params
+ * @param {string} params.regionId
+ * @param {string} params.question
+ * @returns {Promise<{ answer: string }>}
+ */
+export async function askAssistant({ regionId, question }) {
+  return await fetchClient('/ai/assistant', {
+    method: 'POST',
+    body: JSON.stringify({ regionId, question })
+  });
+}
+
 export default {
   getAiExplanation,
-  draftAiAlert
+  draftAiAlert,
+  askAssistant
 };
